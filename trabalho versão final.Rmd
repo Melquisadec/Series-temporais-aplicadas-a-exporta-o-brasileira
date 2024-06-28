@@ -1,10 +1,10 @@
 ---
 title: "Melquisadec"
 output:
-  word_document: default
-  pdf_document: default
   html_document:
     df_print: paged
+  word_document: default
+  pdf_document: default
 ---
 
 ```{r setup, include=FALSE}
@@ -24,23 +24,22 @@ Neste trabalho considerou-se uma serie histórica de exportação Brasileira, e 
 ```{r}
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 if (!require("pacman")) install.packages("pacman")
-p_load(tidyverse, rmdformats,forecast,ggthemes,tseries,magrittr,astsa, rmarkdown,RColorBrewer,extRemes,data.table,quantmod,Quandl, sf,tidyr, ggplot2,readxl,xlsx,openxlsx,stringr,vroom,egg,writexl,knitr,cowplot,forecTheta,
+p_load(tidyverse, rmdformats,forecast,ggthemes,tseries,magrittr,astsa, rmarkdown,RColorBrewer,extRemes,data.table,quantmod,Quandl, sf,tidyr,tinytex, ggplot2,readxl,xlsx,openxlsx,stringr,vroom,egg,writexl,knitr,cowplot,forecTheta,
       Mcomp, kableExtra)
 
 ```
 
-```{r}
+```{r, warning=FALSE}
 treino2=read.table("dados.txt", header = T)
 validacao=read.table("dadosva.txt", header = T)
-nrow(validacao)
 xtreino=treino2[1:228,]
 xteste=validacao[1:60,]
 
 x<- ts(xtreino, start=1999, frequency = 12) #transformando numa serie temporal
-x
+
 xx=ts(xteste, start = 2018, frequency = 12)
-xx
-#h=length(xx)
+
+h=length(xx)
 ```
 ## Materias e Métodos
 ### Dados
@@ -60,7 +59,7 @@ Os modelos ETS em série temporal são modelos que avaliam erro, tendência e sa
 
 Para o critério de escolha do melhor modelo foram utilizados a técnica de janela deslizante, o modelo que obter o menor erro absoluto é o escolhido para fazer previsões O software utilizado para tratamento dos dados foi o software Livre R TEAM 2022.  
 
-## Resultados++
+## Resultados 
 Foi realizado a decomposição da serie histórica para verificar o comportamento dos dados, utilizando a função mstl do R, esta função divide os termos de tendência, sazonalidade e Ruido da serie, pode-se identificar na figura 1 os termos de tendência, ou seja, houve um aumento no na exportação Brasileira comparando os anos de 1999 a 2018, percebe-se também um padrão sazonal, justificável pois grandes volumes de exportações são referntes ao setor agrario e este setor possui épocas determinadas para colheitas, o que geram ciclos sazonais, e por fim o termo de Ruido da série que aparenta um ruido aleatório.
 
 ```{r}
@@ -247,7 +246,7 @@ f_arima1 <- function(y, h){
   forecast(fit, h,bootstrap=T)
 }
 f_arima2 <- function(y, h){
-  fit <- Arima(y, order=c(2, 1, 1), seasonal=c(1, 0, 0), include.mean=F, lambda='auto')
+  fit <- Arima(y, order=c(2, 1, 1), seasonal=c(1, 0, 0), include.mean=F)#, lambda='auto')
   forecast(fit, h,bootstrap=T)
 }
 f_ets1 <- function(y, h){
@@ -255,7 +254,7 @@ f_ets1 <- function(y, h){
   forecast(fit, h,bootstrap=T)
 }
 f_ets2 <- function(y, h){
-  fit <- ets(y, lambda='auto')
+  fit <- ets(y, lambda='0.6295 ')
   forecast(fit, h,bootstrap=T)
 }
 CV_arima1 <- x %>% tsCV(forecastfunction=f_arima1, h=5, initial=n-14)
@@ -296,15 +295,15 @@ tab_plot %>%
 ```
 
 
-
+Note que ETS mais boxcox não é indicado para esta análise
 ```{r, cache=TRUE}
-h=48
+h=60
 preds1 <- forecast(MODELO1, h=h, level=95)
 preds2 <- forecast(MODELO2, h=h, level=95)
 preds3 <- forecast(MODELO3, h=h, level=95)
 preds4 <- forecast(MODELO4, h=h, level=95)
 pontual <- t(cbind(xx, preds1$mean, preds2$mean, preds3$mean, preds4$mean))
-colnames(pontual) <- 1:h
+colnames(pontual) <- 1:60
 row.names(pontual) <- c('Observado', 'ARIMA', 'ARIMA + Box-Cox', 'ETS', 'ETS + Box-Cox')
 pontual %>%
   kable(
@@ -386,7 +385,7 @@ plot_preds(MODELO2, 'ARIMA + Box-Cox')
 
 
 ```
-
+Modelo é ETS com transformação de box cox é inviável a utilização.
 ```{r, cache=TRUE, warning=FALSE}
 plot_preds(MODELO3, 'ETS')
 ```
