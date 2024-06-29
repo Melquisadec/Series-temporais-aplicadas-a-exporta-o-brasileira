@@ -403,7 +403,7 @@ plot_preds(MODELO1, 'ARIMA')
 
 
 ```
-![previmodelo1.png](grafico/prev1.png)
+![previmodelo1.png](grafico/previmodelo1.png)
 
 
 
