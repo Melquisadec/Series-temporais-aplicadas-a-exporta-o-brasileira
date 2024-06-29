@@ -316,7 +316,10 @@ tab_plot %>%
   theme_bw()
 
 ```
-![maecorreto.png](maecorreto.png)
+![maecorreto.png](grafico/maecorreto.png)
+
+A escolha ideal para os modelos são aqueles que obtem menor erro médio absoluto, nota-se que no desempenho do modelo temos dois cenario para a serie suavizada (Trasnformação de boxcox) temos os menores erros por conta da escala dos dados. Mas para este trabalho fizermos a previsão pontual e intervalar para os 4 modelos para fins de testes. 
+As previsões pontual e intervalares foram obtidas por conta do espaço de tabelas omitiremos os resultados das saídas das funções abaixo deixaremos apenas as representações gráficas de previsão
 
 
 ```{r, cache=TRUE}
@@ -341,9 +344,6 @@ pontual %>%
   )
 
 ```
-
-
-
 
 
 
@@ -403,21 +403,32 @@ plot_preds(MODELO1, 'ARIMA')
 
 
 ```
+![previmodelo1.png](grafico/prev1.png)
+
+
+
 ```{r, cache=TRUE}
 plot_preds(MODELO2, 'ARIMA + Box-Cox')
 
 
 ```
+![previmodelo2.png](grafico/previmodelo2.png)
+
 
 ```{r, cache=TRUE, warning=FALSE}
 plot_preds(MODELO3, 'ETS')
 ```
+![previmodelo3.png](grafico/previmodelo3.png)
+
+
 
 ```{r, cache=TRUE, warning=FALSE}
 plot_preds(MODELO4, 'ETS + Box-Cox')
 ```
 
+![previmodelo4.png](grafico/previmodelo4.png)
 
+Com isso concluimos a previsão dos 4 modelos observe que o ajuste do modelo 1, 3 e 4 foram razoavelmente bom, ja o modelo 2 é totalmente inadequado para uso.  para finalizar o trabalho foram testado diversos outros modelos como métricas de Benchmark e utizou-se o menor erro médio absoluto para dizer qual modelo apresentaria melhor perfomace. Omitimos a tabela neste markdown porém o código abaixo gera as métricas de Benchmark
 
 ```{r, warning=FALSE, cache=TRUE}
 # Benchmark comparison
