@@ -66,7 +66,7 @@ Foi realizado a decomposição da serie histórica para verificar o comportament
 ```{r}
 mstl(x, lambda = NULL) %>% autoplot(facet=TRUE, size=0.7, color ="red") + theme_minimal()
 ```
-![mstl.png](https://github.com/Melquisadec/Series-temporais-aplicadas-a-exporta-o-brasileira/tree/main/grafico)
+![mstl.png](grafico/mstl.png)
 
 Para aplicação dos modelos classes arimas é necessario que a serie seja estacionaria (Moretin 2004)  Se uma série {Zt} é não estacionária, logo faz se uma diferença do tipo Wt = Zt - Zt-1 , este processo é feito recursivamente até que a serie se torne estacionária, como visto na decomposição na figura 1 os dados apresentam tendência de crescimento e para fazer com que a serie seja estacionária foram necessários aplicar uma diferenciação, esta função de difernça ja esta implementada no software R basta acionar a função ndifss() para checar se necessita de diferença simples e caso necessite aplica a diferença e nsdiffs() para checar a sazonalidade esta função retorna a quantidade de difenças para que a serie se torne estacionária. Após este procedimento verificou que apenas uma diferença simples e a serie se tornou estacionária.Na figura 2 tem-se as funções de autocorrelação(ACF) e autocorrelação parcial (PACF), estas funções são as representações gráficas dos coeficientes de autocorrelação em função dos retardos (BOX, JENKINS E REINSEL, 1994), na medida em que este gráfico demostram os lags escapam das bandas limites significa que ainda há autocorrelação e o processo não se tornou estacionários, e por estes gráficos em alguns casos pode-se deduzir a ordem do modelo, neste trabalho foi possivel deduzir apenas a ordem d=1 e D=0, não sendo possível obter um modelo completo de forma visual.
 
@@ -88,7 +88,10 @@ acf(dados.diff, 60)
 #autocorrelação parcial (PACF)
 pacf(dados.diff, 60)
 ```
-Para escolha do modelo utilizou-se a função auto.arima do software com parâmetros d=1 e D=0, foram testados todas as possíveis combinações de zero a três dos parâmetros p,q,P,Q o modelo que obteve menor AIC corrigido foi selecionado como o melhor modelo para ser ajustado, logo para o modelo 1 obteve-se um ARIMA(2,1,0)X(1,0,0)12.
+![acfpacfserie.png](grafico/acfpacfserie.png)
+
+
+Nota-se no gráfico acima que não há índícios de autocorrelação espúria, ou seja, a série é estacionária. Há um conceito em que se ecolhe a ordem do modelo gráficamente, porém neste trabalho adotamos uma abordagem simplista, utilizando o próprio software para escolha do modelo então utilizou-se a função auto.arima do software com parâmetros d=1 e D=0, foram testados todas as possíveis combinações de zero a três dos parâmetros p,q,P,Q o modelo que obteve menor AIC corrigido foi selecionado como o melhor modelo para ser ajustado, logo para o modelo 1 obteve-se um ARIMA(2,1,0)X(1,0,0)12.
 
 
 
@@ -98,7 +101,7 @@ MODELO1 = auto.arima(x, d=1, D= 0, max.p = 3,max.q = 3, max.P = 3, max.Q = 3, tr
 stepwise=FALSE)
 MODELO1
 ```
-Após a seleção do modelo para serie de dados originais realizou-se uma transformação de boxcox nos dados e realizou-se novamente o mesmo processo realizado no passo anterior, porém para serie de dados histórica transformadam, na figura 3 tem a representação da serie original juntamente com a serie transformada.
+Após a seleção do modelo para serie de dados originais realizou-se uma transformação de boxcox nos dados e realizou-se novamente o mesmo processo feito no passo anterior, porém para serie de dados histórica transformada.
 
 ```{r}
 # aplicando a Transformação de BOXcox na serie
@@ -106,7 +109,7 @@ data_Bxcx <- BoxCox(x,lambda="auto")
 plot(cbind(x,data_Bxcx))
 
 ```
-Nota-se que não houve uma diferença elevada no padrão de tendência e nem no padrão da sazonalidade isso indica que para as analises gráficas não obteve diferenças significativa na dedução do modelo. Foram realizadas nesta serie teste de tendência, retornando o valor 1 sugerindo uma diferença simples para a serie. aplicada esta diferença a serie se tornou estacionária. Após foram plotados o ACF e PACF para dedução do modelo, porém não foi possível identificar todos os parâmetros.
+Após a realização da transformação de boxcox avaliamos que não houve uma diferença elevada no padrão de tendência e nem no padrão da sazonalidade isso indica que para as analises gráficas não obteve diferenças significativa na dedução do modelo. Foram realizadas nesta serie teste de tendência, retornando o valor 1 sugerindo uma diferença simples para a serie. aplicada esta diferença a serie se tornou estacionária. Após este procedimento foram plotados o ACF e PACF da serie transformada a figura abaixo demonstra esses gráficos.
 
 ```{r}
 #aplicando a diferença simples
@@ -116,10 +119,6 @@ data_Bxcx.diff %>% ndiffs() #checando
 nsdiffs(dados.diff)
 
 ```
-```{r}
-plot(cbind(data_Bxcx, data_Bxcx.diff))
-```
-
 
 ```{r}
 # depois da serie diferenciada analisar o acf e pacf
@@ -127,6 +126,10 @@ par(mfrow=c(2,1))
 acf(data_Bxcx.diff, lag=4*12)
 pacf(data_Bxcx.diff, lag=4*12)
 ```
+
+![acfpacfseriet.png](grafico/acfpacfseriet.png)
+
+
 
 Para identificar o modelo utilizou-se a abordagem simplista para estimar os parâmetros p,q,P,Q, sendo d=1 e D=0. Foram testados os valores de destes parâmetros de 0 a 3 e o modelo com melhor AICc foi escolhido foi um arima (2,1,1)x(1,0,0)12.
 
@@ -156,6 +159,8 @@ plot(MODELO.ETS1)
 ```
 
 
+
+
 O quarto modelo proposto Foi o modelo ETS holt winter, com Erro multiplicativo, Tendência aditiva e sazonalidade Multiplicativa, a figura mostra a decomposição da serie em termos de level, sazonalidade e serie observada. O modelo foi gerado através de uma função automática no R que calcula os parâmetros do modelO.
 Após o ajuste dos modelos foram avaliados os resíduos.
 ```{r}
@@ -177,6 +182,8 @@ MODELO4
 E1 <- MODELO1$residuals
 E1 %>% plot(main = "Resíduos do modelo ARIMA(0,1,3)(2,0,0)[12] ")
 ```
+![residuomodelo1.png](grafico/residuomodelo1.png)
+
 Nas figuras acima demonstra o comportamento dos resíduos quanto a aleatoridade, o gráfico qqplot demonstra se os resíduos são normais e o acf demonstra se ainda ha autorrelação, ou seja, ele indica se os resíduos são ou não independentes, porém além da anlálise gráfica faz se necessaria um avaliação através de testos estatísticos sob hipótese nula a rejeição ou não da normalidade, independencia e estacionaridade. Para os modelos selecionados foram avaliados estas pressuposições através dos testes kpss (Testa estacionaridade), Box Ljung teste (Testa a idependencia dos resíduos) e shapiro wilks (Testa a normaliade dos resíduos)
 ```{r}
 par(mfrow=c(2,1))
@@ -196,8 +203,21 @@ Para o modelo 1 (Arima sazonal), os resíduos passaram no teste a 5% de signific
 E2=MODELO2$residuals
 E2 <- MODELO2$residuals %>% plot(main = "Residuo Modelo2")
 ```
+![residuomodelo2.png](grafico/residuomodelo2.png)
 
+```{r}
+E3=MODELO3$residuals
+E3 <- MODELO3$residuals %>% plot(main = "Residuo Modelo3")
+```
+![residuomodelo3.png](grafico/residuomodelo3.png)
 
+```{r}
+E4=MODELO4$residuals
+E4 <- MODELO4$residuals %>% plot(main = "Residuo Modelo4")
+```
+![residuomodelo4.png](grafico/residuomodelo4.png)
+
+Gráficamente parece que a normalidade não foi bem comportada em todos os casos, de qualquer optamos por realizar alguns teste tanto para normalidade quanto para idependência. Adotamos teste de Shapiro e teste de Ljung Box. Caso a normalidade não for atendida proceguimos com as análises. Para estimativas pontuais não ha problemas o pressuposto de normalidade ser quebrado, o que implica é na estimativa intervalar e para contornar este problema pode construir intervalos de confiança via booststrap
 
 ```{r}
 MODELO2
@@ -235,6 +255,7 @@ shapiro.test(E4)
 ```
 
 # Janela deslizante
+A janela deslizante é um procedimento usado para analisar dados sequenciais ao longo do tempo. Funciona criando subconjuntos dos dados com um tamanho fixo, movendo essa janela ao longo da série temporal para capturar diferentes segmentos. A cada passo, a janela se desloca uma unidade (por exemplo, um dia, uma semana, um mês) para frente, incluindo um novo ponto de dados e excluindo o ponto mais antigo. Esse método permite suavizar flutuações, identificar tendências, padrões e anomalias, além de ser útil em previsões e na modelagem de séries temporais. A janela deslizante é frequentemente aplicada em análises financeiras, meteorológicas e de dados de sensores, entre outras áreas. Dito isto nos aplicamos a janela deslizante e para cada ponto calculamos a diferença absoluta (MAE - erro médio absoluto) entre o valor predito e o valor observado e plotamos no gráfico para os 4 modelos.
 
 ```{r, cache=TRUE}
 n=length(x) 
@@ -295,7 +316,7 @@ tab_plot %>%
   theme_bw()
 
 ```
-
+![maecorreto.png](maecorreto.png)
 
 
 ```{r, cache=TRUE}
