@@ -60,12 +60,13 @@ Os modelos ETS em série temporal são modelos que avaliam erro, tendência e sa
 
 Para o critério de escolha do melhor modelo foram utilizados a técnica de janela deslizante, o modelo que obter o menor erro absoluto é o escolhido para fazer previsões O software utilizado para tratamento dos dados foi o software Livre R TEAM 2022.  
 
-## Resultados++
+## Resultados
 Foi realizado a decomposição da serie histórica para verificar o comportamento dos dados, utilizando a função mstl do R, esta função divide os termos de tendência, sazonalidade e Ruido da serie, pode-se identificar na figura 1 os termos de tendência, ou seja, houve um aumento no na exportação Brasileira comparando os anos de 1999 a 2018, percebe-se também um padrão sazonal, justificável pois grandes volumes de exportações são referntes ao setor agrario e este setor possui épocas determinadas para colheitas, o que geram ciclos sazonais, e por fim o termo de Ruido da série que aparenta um ruido aleatório.
 
 ```{r}
 mstl(x, lambda = NULL) %>% autoplot(facet=TRUE, size=0.7, color ="red") + theme_minimal()
 ```
+![mstl.png](https://github.com/Melquisadec/Series-temporais-aplicadas-a-exporta-o-brasileira/tree/main/grafico)
 
 Para aplicação dos modelos classes arimas é necessario que a serie seja estacionaria (Moretin 2004)  Se uma série {Zt} é não estacionária, logo faz se uma diferença do tipo Wt = Zt - Zt-1 , este processo é feito recursivamente até que a serie se torne estacionária, como visto na decomposição na figura 1 os dados apresentam tendência de crescimento e para fazer com que a serie seja estacionária foram necessários aplicar uma diferenciação, esta função de difernça ja esta implementada no software R basta acionar a função ndifss() para checar se necessita de diferença simples e caso necessite aplica a diferença e nsdiffs() para checar a sazonalidade esta função retorna a quantidade de difenças para que a serie se torne estacionária. Após este procedimento verificou que apenas uma diferença simples e a serie se tornou estacionária.Na figura 2 tem-se as funções de autocorrelação(ACF) e autocorrelação parcial (PACF), estas funções são as representações gráficas dos coeficientes de autocorrelação em função dos retardos (BOX, JENKINS E REINSEL, 1994), na medida em que este gráfico demostram os lags escapam das bandas limites significa que ainda há autocorrelação e o processo não se tornou estacionários, e por estes gráficos em alguns casos pode-se deduzir a ordem do modelo, neste trabalho foi possivel deduzir apenas a ordem d=1 e D=0, não sendo possível obter um modelo completo de forma visual.
 
